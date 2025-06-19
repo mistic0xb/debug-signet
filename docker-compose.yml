@@ -6,19 +6,14 @@ services:
     image: dockurr/strfry:latest
     mem_limit: 1024m
     cpus: 0.2
-    environment:
-      VIRTUAL_HOST: relay.angor.io
-      VIRTUAL_PORT: 7777
-      VIRTUAL_PROTO: http
-      VIRTUAL_NETWORK: proxy
-      LETSENCRYPT_HOST: relay.angor.io
-      LETSENCRYPT_EMAIL: admin@blockcore.net
     restart: unless-stopped
     volumes:
       - ./strfry/:/app/strfry-db
       - ./strfry/strfry.conf:/etc/strfry.conf
+    expose:
+      - 7777
     networks:
-      - proxy
+      - nostr-network
 
   web:
     image: getumbrel/umbrel-nostr-relay
@@ -28,12 +23,34 @@ services:
     environment:
       RELAY_HOST: "strfry-relay"
       RELAY_PORT: "7777"
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
     networks:
-      - proxy
+      - nostr-network
+
+  caddy:
+    container_name: caddy
+    image: caddy:2.8
+    mem_limit: 256m
+    cpus: 0.1
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN=debugrelay.angor.online
+      - EMAIL=admin@blockcore.net
+    networks:
+      - nostr-network
 
 networks:
-  proxy:
-    external: true
-    name: proxy
+  nostr-network:
+    name: nostr-network
+
+volumes:
+  caddy_data:
+  caddy_config:

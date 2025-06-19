@@ -1,0 +1,4 @@
+debugrelay.angor.online:443 {
+  reverse_proxy / strfry-relay:7777
+  reverse_proxy /web/* public-relay-web:3000
+}
