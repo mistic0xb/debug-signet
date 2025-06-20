@@ -10,6 +10,8 @@ services:
     volumes:
       - ./strfry/:/app/strfry-db
       - ./strfry/strfry.conf:/etc/strfry.conf
+    ports:
+      - "0.0.0.0:7777:7777"
     expose:
       - 7777
     networks:
@@ -23,6 +25,8 @@ services:
     environment:
       RELAY_HOST: "strfry-relay"
       RELAY_PORT: "7777"
+    ports:
+      - "0.0.0.0:3000:3000"
     expose:
       - 3000
     networks:
